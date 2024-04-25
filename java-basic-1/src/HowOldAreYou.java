@@ -11,20 +11,51 @@ public class HowOldAreYou {
 
 			// readLine() は、入出力エラーの可能性がある。エラー処理がないとコンパイルできない。
 			//  Java では、 try{ XXXXXXXX }  catch(エラーの型 変数) { XXXXXXXXXXXXXXXXXX} と書く
-		try {
-			System.out.println("何歳ですか?");
-			String line = reader.readLine();
-			int age = Integer.parseInt(line);
-			//System.out.println("あなたは" + age + "歳ですね。");
-			//System.out.println("あなたは10年後、" + (age + 10) + "歳ですね。");
-			System.out.println("2030年のあなたの年齢は" + (age + 6) + "歳ですね。");
+		while(true){
+			try {
+				System.out.println("何歳ですか?（終了する場合はqまたはeを入力してください。)");
+				String line = reader.readLine();
 
+				if(line.equals("q")||line.equals("e")){
+					System.out.println("終了します。");
+					break;
+				}//qもしくはeが入力されたら終了する。
+
+				int age = Integer.parseInt(line);
+
+				if(age < 0 || age >= 120){
+					System.out.println("無効な年齢です。再入力してください。");
+					continue;
+				}//入力された数がマイナス若しくは120歳以上の場合は再入力をしてもらう。
+
+				System.out.println("2030年のあなたの年齢は" + (age + 6) + "歳ですね。");
+				int seireki = 2024 - age;
+				if(seireki>=2019 && seireki<=2024){
+					int n = seireki - 2018;
+					System.out.println("あなたが誕生したのは令和" + n + "年ですね。");
+				}
+				else if(seireki>=1989 && seireki<=2018){
+					int n = seireki - 1988;
+					System.out.println("あなたが誕生したのは平成" + n + "年ですね。");
+				}
+				else if(seireki>=1926 && seireki<=1988){
+					int n = seireki - 1925;
+					System.out.println("あなたが誕生したのは昭和" + n + "年ですね。");
+				}
+				else if(seireki >= 1912 && seireki <= 1925){
+					int n = seireki -1911;
+					System.out.println("あなたが誕生したのは大正" + n + "年ですね。");
+				}
+				else if(seireki>=1905 &&seireki<=1911){
+					int n = seireki - 1941;
+					System.out.println("あなたが誕生したのは明治" + n + "年ですね。");
+				}
+	
+			}
+			catch(IOException e) {
+				System.out.println(e);
+			}
 		}
-		catch(IOException e) {
-			System.out.println(e);
-		}
-
-
 	}
 }
 
