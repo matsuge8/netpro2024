@@ -1,22 +1,22 @@
 package thread;
 
 // Runnable インターフェースを実装することで、このクラスのインスタンスはスレッドとして実行可能になります。
-public class CountDayTenRunnable implements Runnable {
+public class ExThreadsMainTes implements Runnable {
     String myAlfabetStr="noalfabet";
 
 
     // main メソッドはプログラムのエントリーポイントです。
     public static void main(String[] args){
-        CountDayTenRunnable[] cts = new CountDayTenRunnable[7];
+        ExThreadsMainTes[] cts = new ExThreadsMainTes[7];
         String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
         for(int i = 0; i < 7; i++){
-            cts[i] = new CountDayTenRunnable();
+            cts[i] = new ExThreadsMainTes();
             String name = daysOfWeek[i] +"_chan thread";
             cts[i].setAlfabet(name);
         }
 
-        for(CountDayTenRunnable ct:cts){
+        for(ExThreadsMainTes ct:cts){
             new Thread(ct).start();
         }
 
