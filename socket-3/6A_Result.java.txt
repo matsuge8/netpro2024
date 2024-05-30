@@ -1,0 +1,10 @@
+UDPServer1.java
+C:\Users\atom0\Desktop\netpro2024\socket-3> cmd /C "C:\Users\atom0\AppData\Roaming\Code\User\globalStorage\pleiades.java-extension-pack-jdk\java\21\bin\java.exe -XX:+ShowCodeDetailsInExceptionMessages -cp C:\Users\atom0\Desktop\netpro2024\socket-3\bin udp.UDPServer1 "
+サーバーが起動しました。
+受信したメッセージ: abc
+送信したメッセージ: ABC
+
+UDPClient1.java
+C:\Users\atom0\Desktop\netpro2024\socket-3> cmd /C "C:\Users\atom0\AppData\Roaming\Code\User\globalStorage\pleiades.java-extension-pack-jdk\java\21\bin\java.exe -XX:+ShowCodeDetailsInExceptionMessages -cp C:\Users\atom0\Desktop\netpro2024\socket-3\bin udp.UDPClient1 "
+送信したメッセージ: abc
+受信したメッセージ: ABC
