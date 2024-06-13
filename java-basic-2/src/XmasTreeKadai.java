@@ -4,24 +4,24 @@ public class XmasTreeKadai {
         int mikihight = 7;
         String x = "*";
 		for(int i = 0; i < hight; i++){
-            for(int h = 0; h <=20-i; h++){
+            /* for(int h = 0; h <=20-i; h++){
                 if(h%2 == 0){
                     System.out.print(" ");
                 }else{
                 System.out.print("+");
                 }
-            }
+            } */
             for(int j = 0; j <= i; j++){
                 System.out.print(x);
                 System.out.print(x);
             }
-            for(int h = 0; h <=20-i; h++){
+           /*  for(int h = 0; h <=20-i; h++){
                 if(h%2 == 1){
                     System.out.print(" ");
                 }else{
                 System.out.print("+");
                 }
-            }
+            } */
             System.out.print("\n");
             
         }
