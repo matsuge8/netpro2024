@@ -70,7 +70,6 @@ class GUIAniMultiTCPClient2 {
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
 
@@ -99,7 +98,7 @@ class GUIAniMultiTCPClient2 {
 				System.out.println("Connect to " + inadr);
 			} else {
 				System.out.println("Connection failed.");
-				return;
+				//return;
 			}
 
 			// メッセージの送信処理
