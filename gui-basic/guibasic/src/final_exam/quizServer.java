@@ -1,4 +1,4 @@
-package saisyukadai;
+package final_exam;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,9 +8,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class quizServer {
-    //問題文と答えの配列を読み込む今回は例として以下を置く
-    private static final String QUESTION = "What is 1 + 1?";
-    private static final String CORRECT_ANSWER = "2";
 
     public static void main(String[] args) {
         new quizServer().startServer();
@@ -41,21 +38,26 @@ public class quizServer {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             ) {
-                out.println(quiz.geQuiz());
-                String response = in.readLine();
-                boolean correct = false;
-                while (response != null) {
-                    if (response.equals(quiz.getCor())) {
+                quiz.setQandCor();
+                if (quiz.getQuiz() == null) {
+                    out.println("No more questions available.");
+                    return;
+                }
+                out.println(quiz.getQuiz());
+                String response;
+                while ((response = in.readLine()) != null) {
+                    if (response.equalsIgnoreCase(quiz.getCor())) {
                         out.println("Correct!");
-                        correct = true;
-                        break;
+                        quiz.moveToNextQuiz();
+                        if (quiz.getQuiz() == null) {
+                            out.println("No more questions available.");
+                            break;
+                        }
+                        out.println(quiz.getQuiz());
                     } else {
                         out.println("Incorrect! Try again.");
                     }
                 }
-                if (!correct) {
-                    out.println("The correct answer is " + quiz.getCor());
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -68,21 +70,3 @@ public class quizServer {
         }
     }
 }
-                /* String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    System.out.println("Received: " + inputLine);
-                    out.println("6 " + inputLine);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    clientSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-}
- */
