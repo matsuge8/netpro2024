@@ -12,11 +12,14 @@ public class quiz {
     static String[] correct = { "A", "B", "C" };
     static int quizIdx = 0;
     public static void setQandCor() {
-        Collections.shuffle(targetList);
         for (int i = 0; i < quiz.length; i++) {
             q[i] = quiz[targetList.get(i)];
             c[i] = correct[targetList.get(i)];
         }
+    }
+    public static void resetQuiz(){
+        Collections.shuffle(targetList);
+        quizIdx = 0;
     }
     public static void moveToNextQuiz() {
         quizIdx++;
@@ -25,9 +28,9 @@ public class quiz {
         return ans;
     }
     public static String getCor() {
-        return c[quizIdx];
+        return correct[targetList.get(quizIdx)];
     }
     public static String getQuiz() {
-        return q[quizIdx];
+        return quiz[targetList.get(quizIdx)];
     }
 }

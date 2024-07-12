@@ -1,4 +1,5 @@
 package final_exam;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class quizClient extends JFrame {
     private JTextField answerField;
@@ -21,7 +23,7 @@ public class quizClient extends JFrame {
     private JScrollPane scrollPane;
 
     public quizClient() {
-        // GUI Setup
+        // GUI settings
         setTitle("Quiz Client");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,19 +46,23 @@ public class quizClient extends JFrame {
 
         setVisible(true);
 
-       // サーバーに接続
+        // Connect to server
         connectToServer();
     }
 
-    @SuppressWarnings("resource")
     private void connectToServer() {
         try {
             Socket socket = new Socket("localhost", 5000);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            // サーバーからの質問を受け取る
-            receiveQuestion();
+            // Receive questions from the server
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    receiveQuestion();
+                }
+            }).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,12 +70,13 @@ public class quizClient extends JFrame {
 
     private void receiveQuestion() {
         try {
-            String question = in.readLine();
-            if (question.equals("No more questions available.")) {
-                displayArea.append(question + "\n");
-                answerField.setEditable(false);
-            } else {
-                displayArea.append("Question: " + question + "\n");
+            String question;
+            while ((question = in.readLine()) != null) {
+                appendToDisplayArea(question);
+                if (question.equals("No more questions available.")) {
+                    answerField.setEditable(false);
+                    break;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -79,17 +86,18 @@ public class quizClient extends JFrame {
     private void sendAnswer() {
         String answer = answerField.getText();
         out.println(answer);
-        try {
-            String response = in.readLine();
-            displayArea.append("You: " + answer + "\n");
-            displayArea.append("Response: " + response + "\n");
-            if (response.equals("Correct!")) {
-                receiveQuestion();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        appendToDisplayArea("You: " + answer);
         answerField.setText("");
+    }
+
+    private void appendToDisplayArea(String message) {
+        displayArea.append(message + "\n");
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+            }
+        });
     }
 
     public static void main(String[] args) {

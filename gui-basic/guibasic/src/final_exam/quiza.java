@@ -30,13 +30,13 @@ public class quiza {
         this.q = quiz[0];
     } */
 
-    public void matchingAns() {
+    /* public void matchingAns() {
         if (ans == cor) {
             System.out.println("Correct!");
         } else {
             System.out.println("Again...");
         }
-    }
+    } */
 
     public String getAns() {
         return ans;
