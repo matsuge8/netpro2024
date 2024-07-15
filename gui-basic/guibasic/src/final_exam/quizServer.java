@@ -29,11 +29,15 @@ public class quizServer extends JFrame {
     private int serverScore = 0;
     private int clientScore = 0;
 
-    private quiz q = new quiz();
+    private quiz quiz = new quiz();
 
     public quizServer() {
-        // GUI画面の設定
-        setTitle("Quiz Server");
+        setupGUI();
+        startServer();
+    }
+
+    private void setupGUI() {
+        setTitle("プレイヤー1");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -54,41 +58,35 @@ public class quizServer extends JFrame {
         });
 
         setVisible(true);
+    }
 
-        // Start server
+    private void startServer() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                startServer();
+                try {
+                    serverSocket = new ServerSocket(5000);
+                    appendToDisplayArea("サーバーを開始。接続を待っています・・・");
+                    clientSocket = serverSocket.accept();
+                    appendToDisplayArea("クライアントが接続しました。: " + clientSocket.getInetAddress());
+                    new ClientHandler(clientSocket).start();
+
+                    handleServerSideQuiz();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }).start();
     }
 
-    private void startServer() {
-        try {
-            serverSocket = new ServerSocket(5000);
-            appendToDisplayArea("サーバーを開始。接続を待っています・・・");
-            clientSocket = serverSocket.accept();
-            appendToDisplayArea("クライアントが接続しました。: " + clientSocket.getInetAddress());
-            new ClientHandler(clientSocket).start();
-
-            // サーバー側からクイズを開始する
-            handleServerSideQuiz();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void handleServerSideQuiz() {
-        q.resetQuiz(); // クイズクラスの問題をシャッフルします
-        q.setQandCor(); // シャッフルしたクイズを配列にセットする
-        if (q.getQuiz() == null) { // クイズが読み込めなかったとき、サーバーを立て直すように表示する。
+        quiz.resetQuiz();
+        quiz.setQandCor();
+        if (quiz.getQuizSentence() == null) {
             appendToDisplayArea("問題を読み込むことに失敗しました。もう一度、サーバーを立て直してください。");
             sendToClient("問題を読み込むことに失敗しました。もう一度、サーバーを立て直してください。");
         } else {
-            String question = q.getQuiz(); // 問題を取得
-            appendToDisplayArea("問題: " + question);
-            sendToClient("問題: " + question);
+            sendQuestionToClient();
         }
     }
 
@@ -97,28 +95,38 @@ public class quizServer extends JFrame {
         appendToDisplayArea("あなた: " + answer);
         sendToClient("対戦相手: " + answer);
 
-        if (answer.equalsIgnoreCase(q.getCor())) {
+        if (answer.equalsIgnoreCase(quiz.getCor())) {
             appendToDisplayArea("正解です!");
             sendToClient("対戦相手が正解しました!");
             serverScore++;
-            if (q.isLastQuestion()) {
-                displayScores();
-            } else {
-                q.moveToNextQuiz(); // 次の問題に移動
-                String question = q.getQuiz(); // 問題を取得
-                appendToDisplayArea("問題: " + question);
-                sendToClient("問題: " + question);
-            }
-
+            handleNextQuestion();
         } else {
             appendToDisplayArea("不正解! もう一度考え直して.");
             sendToClient("対戦相手の回答は不正解です!");
         }
 
         answerField.setText("");
-        synchronized (this) {
-            notify(); // Notify the server that the answer is sent
+    }
+
+    private void handleNextQuestion() {
+        if (quiz.isLastQuestion()) {
+            displayScores();
+        } else {
+            quiz.moveToNextQuiz();
+            sendQuestionToClient();
         }
+    }
+
+    private void sendQuestionToClient() {
+        String question = quiz.getQuizSentence();
+        appendToDisplayArea("\n");
+        appendToDisplayArea("第" + quiz.getQuizIndex() + "問");
+        appendToDisplayArea("問題: " + question);
+        appendToDisplayArea("（解答形式：" + quiz.getAnswerFormat() + "）");
+        sendToClient("\n");
+        sendToClient("第" + quiz.getQuizIndex() + "問");
+        sendToClient("問題: " + question);
+        sendToClient("（解答形式：" + quiz.getAnswerFormat() + "）");
     }
 
     private void sendToClient(String message) {
@@ -139,11 +147,23 @@ public class quizServer extends JFrame {
 
     private void displayScores() {
         appendToDisplayArea("最終スコア:");
-        appendToDisplayArea("サーバー: " + serverScore);
-        appendToDisplayArea("クライアント: " + clientScore);
+        appendToDisplayArea("あなた: " + serverScore);
+        appendToDisplayArea("相手: " + clientScore);
         sendToClient("最終スコア:");
-        sendToClient("サーバー: " + serverScore);
-        sendToClient("クライアント: " + clientScore);
+        sendToClient("相手: " + serverScore);
+        sendToClient("あなた: " + clientScore);
+        if( serverScore > clientScore){
+            appendToDisplayArea("あなたの勝利!!!");
+            sendToClient("相手の勝利!!");
+        }else if(serverScore < clientScore){
+            appendToDisplayArea("相手の勝利!!");
+            sendToClient("あなたの勝利!!");
+        }else{
+            appendToDisplayArea("同点!!");
+            sendToClient("同点!!");
+        }
+        appendToDisplayArea("プレイしてくれてありがとう!!また遊んでね");
+        sendToClient("プレイしてくれてありがとう!!また遊んでね");
     }
 
     private class ClientHandler extends Thread {
@@ -162,25 +182,14 @@ public class quizServer extends JFrame {
                 while ((response = in.readLine()) != null) {
                     appendToDisplayArea("クライアント: " + response);
 
-                    if (response.equalsIgnoreCase(q.getCor())) {
+                    if (response.equalsIgnoreCase(quiz.getCor())) {
                         appendToDisplayArea("クライアントが正解しました!");
                         sendToClient("正解です!");
                         clientScore++;
-                        if (q.isLastQuestion()) {
-                            displayScores();
-                        } else {
-                            q.moveToNextQuiz();
-                            String question = q.getQuiz(); // 問題を取得
-                            appendToDisplayArea("問題: " + question);
-                            sendToClient("問題: " + question);
-                        }
+                        handleNextQuestion();
                     } else {
                         appendToDisplayArea("クライアントの回答は不正解です!");
                         sendToClient("不正解です! もう一度お試しください.");
-                    }
-
-                    synchronized (quizServer.this) {
-                        quizServer.this.notify(); // Notify the server that the client's answer is received
                     }
                 }
             } catch (IOException e) {

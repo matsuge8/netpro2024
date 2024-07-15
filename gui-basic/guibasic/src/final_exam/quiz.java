@@ -6,10 +6,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class quiz {
-    private String[] q = new String[10];
-    private String[] c = new String[10];
-    List<Integer> targetList = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
-    String[] quiz = {   
+    private String[] quiz = new String[10];
+    private String[] correct = new String[10];
+    private String[] format = new String[10];
+    private List<Integer> targetList = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+    private String[] quizSentence = {   
         "ドラえもんに登場するスネ夫の名字は？",
         "ドラえもんの好物はどらやき、では妹のドラミちゃんの好物は？",
         "２００９年８月２１日に最初の公判がおこなわれた、特定の刑事裁判において、国民から選ばれた人と裁判官とともに審理に参加する日本の司法制度を何制度と言う？",
@@ -21,20 +22,25 @@ public class quiz {
         "硬式テニスで０点のことを２文字で何と言うでしょう？",
         "バレーボールで攻撃をすることが出来ない守備専門のプレーヤーを何と言うでしょう?" 
     };
-    String[] correct = { 
-        "骨川", "メロンパン", "裁判員制度", "４０個", "サイクルヒット", 
+    private String[] correctAnswer = { 
+        "骨川", "メロンパン", "裁判員制度", "40", "サイクルヒット", 
         "クッキー", "さくらももこ", "フロッピーディスク", "ラブ", "リベロ" 
+    };
+    private String[] answerFormat = { 
+        "漢字", "カタカナ", "漢字", "半角数字", "カタカナ",
+        "カタカナ", "ひらがな", "カタカナ", "カタカナ", "カタカナ"
     };
     private int quizIdx = 0;
 
     public void setQandCor() {
-        for (int i = 0; i < quiz.length; i++) {
-            q[i] = quiz[targetList.get(i)];
-            c[i] = correct[targetList.get(i)];
+        for (int i = 0; i < quizSentence.length; i++) {
+            quiz[i] = quizSentence[targetList.get(i)];
+            correct[i] = correctAnswer[targetList.get(i)];
+            format[i] = answerFormat[targetList.get(i)];
         }
     }
 
-    public void resetQuiz(){
+    public void resetQuiz() {
         Collections.shuffle(targetList);
         quizIdx = 0;
     }
@@ -44,18 +50,26 @@ public class quiz {
     }
 
     public String getCor() {
-        return c[quizIdx];
+        return correct[quizIdx];
     }
 
-    public String getQuiz() {
-        return q[quizIdx];
+    public String getQuizSentence() {
+        return quiz[quizIdx];
+    }
+
+    public String getAnswerFormat(){
+        return format[quizIdx];
     }
 
     public int getQuizLength() {
-        return quiz.length;
+        return quizSentence.length;
     }
 
     public boolean isLastQuestion() {
-        return quizIdx >= quiz.length - 1;
+        return quizIdx >= quizSentence.length - 1;
+    }
+
+    public int getQuizIndex(){
+        return quizIdx + 1;
     }
 }

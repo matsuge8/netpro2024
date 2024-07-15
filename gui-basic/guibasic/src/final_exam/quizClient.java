@@ -23,7 +23,11 @@ public class quizClient extends JFrame {
     private JScrollPane scrollPane;
 
     public quizClient() {
-        // GUI settings
+        setupGUI();
+        connectToServer();
+    }
+
+    private void setupGUI() {
         setTitle("Quiz Client");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,27 +49,23 @@ public class quizClient extends JFrame {
         });
 
         setVisible(true);
-
-        // Connect to server
-        connectToServer();
     }
 
     private void connectToServer() {
-        try {
-            Socket socket = new Socket("localhost", 5000);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Socket socket = new Socket("localhost", 5000);
+                    out = new PrintWriter(socket.getOutputStream(), true);
+                    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            // Receive questions from the server
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
                     receiveQuestion();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            }).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            }
+        }).start();
     }
 
     private void receiveQuestion() {
@@ -73,8 +73,7 @@ public class quizClient extends JFrame {
             String question;
             while ((question = in.readLine()) != null) {
                 appendToDisplayArea(question);
-                if (question.equals("No more questions available.")) {
-                    answerField.setEditable(false);
+                if (question.equals("プレイしてくれてありがとう!!また遊んでね")) {
                     break;
                 }
             }
