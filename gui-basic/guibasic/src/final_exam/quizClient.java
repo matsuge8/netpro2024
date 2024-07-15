@@ -86,7 +86,7 @@ public class quizClient extends JFrame {
     private void sendAnswer() {
         String answer = answerField.getText();
         out.println(answer);
-        appendToDisplayArea("You: " + answer);
+        appendToDisplayArea("あなた: " + answer);
         answerField.setText("");
     }
 
